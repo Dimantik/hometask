@@ -5,7 +5,6 @@
 #define LIST_POINTER_MARKER 2
 
 struct Node {
-    int index;
     int value;
     struct Node *nextElement;
 };
@@ -18,10 +17,8 @@ struct List {
 
 
 int isNullPointer(void *pointer, int pointerMarker);
-void incrementIndex(struct Node *node);
-void decrementIndex(struct Node *node);
 void printNode(struct Node *node);
-void clearNode(struct Node *node);
+void clearNodes(struct Node *node);
 
 
 //Main functions
@@ -47,7 +44,6 @@ struct Node* createNode(int value) {
     struct Node *node = (struct Node*)malloc(sizeof(struct Node));
 
     if (node != NULL) {
-        (*node).index = -1;
         (*node).value = value;
         (*node).nextElement = NULL;
     }
@@ -64,8 +60,6 @@ int insertToHead(struct List *list, struct Node *node) {
 
     }
 
-    (*node).index = 0;
-
     if ((*list).head == NULL){
 
         (*list).head = node;
@@ -79,7 +73,6 @@ int insertToHead(struct List *list, struct Node *node) {
     }
 
     (*list).length++;
-    incrementIndex((*node).nextElement);
 
     return 1;
     
@@ -92,8 +85,6 @@ int insertToTail(struct List *list, struct Node *node) {
         return 0;
 
     }
-
-    (*node).index = (*list).length;
 
     if ((*list).tail == NULL) {
 
@@ -113,55 +104,61 @@ int insertToTail(struct List *list, struct Node *node) {
 
 }
 
-int insertByIndex(struct List *list, struct Node *node, int index) {
+int insertAfterValue(struct List *list, struct Node *node, int value) {
 
     if (isNullPointer(list, LIST_POINTER_MARKER) || isNullPointer(node, NODE_POINTER_MARKER)) {
         
+        printf("THERE 1");
         return 0;
 
-    }
-
-    if (index > (*list).length || index < 0) {
-        return 0;
     }
 
     struct Node *currentNode = (*list).head;
+    
+    int isFindValue = 0;
 
-    if (index == 0) {
-
-        insertToHead(list, node);
-
-    } else if (index == (*list).length) {
+    if ((*(*list).tail).value == value) {
 
         insertToTail(list, node);
+         
+        printf("THERE 2");
 
-    } else {
-
-        for (int i = 0; i < (*list).length - 1; i++) {
-
-            if ((*currentNode).index == index - 1) {
-                
-                (*node).nextElement = (*currentNode).nextElement;
-                (*currentNode).nextElement = node;
-                (*node).index = (*currentNode).index + 1;
-                incrementIndex((*node).nextElement);
-
-                break;
-
-            } else {
-
-                currentNode = (*currentNode).nextElement;
-
-            }
-
-        }
-
-        (*list).length++;
-
+        return 1;
 
     }
 
-    return 1;
+    for (int i = 0; i < (*list).length - 1; i++) {
+
+        printf("\nEl = %d, val = %d", (*currentNode).value, value);
+        if ((*currentNode).value == value) {
+
+            isFindValue = 1;
+
+            (*node).nextElement = (*currentNode).nextElement;
+            (*currentNode).nextElement = node;
+
+            break;
+
+        }
+
+        currentNode = (*currentNode).nextElement;
+
+    }
+
+    if (isFindValue) {
+
+        (*list).length++;
+
+        printf("THERE 3");
+        return 1;
+
+    } else {
+
+        printf("THERE 4");
+
+        return 0;
+
+    }
     
 }
 
@@ -180,11 +177,11 @@ int deleteNodeByValue(struct List *list, int value) {
 
         if ((*currentNode).value == value) {
 
-            if ((*currentNode).index == 0) {
+            if (currentNode == (*list).head) {
 
                 (*list).head = (*currentNode).nextElement;
 
-            } else if ((*currentNode).index == (*list).length - 1) {\
+            } else if (currentNode == (*list).tail) {
 
                 (*list).tail = previousNode;
                 (*previousNode).nextElement = NULL;
@@ -195,7 +192,6 @@ int deleteNodeByValue(struct List *list, int value) {
 
             }
 
-            decrementIndex((*currentNode).nextElement);
             free(currentNode);
             (*list).length--;
             
@@ -256,7 +252,7 @@ int clearList(struct List *list) {
     (*list).head = NULL;
     (*list).tail = NULL;
     (*list).length = 0;
-    clearNode(firstNode);
+    clearNodes(firstNode);
 
     return 1;
 
@@ -270,38 +266,86 @@ void clearNodes(struct Node *node) {
 
     struct Node *nextElement = (*node).nextElement;
     free(node);
-    clearNode(nextElement);
+    clearNodes(nextElement);
 
+}
+
+int createCycle(struct List *list, int value) {
+
+    struct Node *currentNode = (*list).head;
+
+    int isFind = 0;
+
+    for (int i = 0; i < (*list).length; i++) {
+
+        if ((*currentNode).value == value) {
+
+            isFind = 1;
+            break;
+
+        }
+
+        currentNode = (*currentNode).nextElement;
+
+    }
+
+    if (isFind) {
+
+        struct Node *p = (*currentNode).nextElement;
+        insertToTail(list, currentNode);
+        if ((*list).tail != NULL) {
+            printf("\nHERE1 %d", (*(*(*list).tail).nextElement).value);
+        } else {
+            printf("\nHERE2 %d");
+        }
+        (*currentNode).nextElement = p;
+        return 1;
+
+    } else {
+
+        return 0;
+
+    }
+
+}
+
+int findCycle(struct List *list) {
+
+    struct Node *pointOne = (*list).head;
+    struct Node *pointTwo = (*pointOne).nextElement;
+    
+    int isHaveCycle = 0;
+
+    while(1) {
+
+        if (pointOne == NULL || pointTwo == NULL) {
+            break;
+        }
+
+        if (pointOne == pointTwo) {
+            isHaveCycle = 1;
+            break;
+        }
+
+        pointOne = (*pointOne).nextElement;
+        pointTwo = (*pointTwo).nextElement;
+
+        if (pointTwo == NULL) {
+            break;
+        }
+
+        pointTwo = (*pointTwo).nextElement;
+
+    }
+
+    return isHaveCycle;
 }
 
 //Secondary functions
 
-void incrementIndex(struct Node *node) {
-
-    if (node == NULL) {
-        return;
-    }
-    
-    (*node).index++;
-    incrementIndex((*node).nextElement);
-
-}
-
-void decrementIndex(struct Node *node) {
-
-    if (node == NULL) {
-        return;
-    }
-
-    (*node).index--;
-
-    decrementIndex((*node).nextElement);
-
-}
-
 void printNode(struct Node *node) {
 
-    printf("Element %d: value = %d\n", (*node).index, (*node).value);
+    printf("%d -> ", (*node).value);
 
 }
 

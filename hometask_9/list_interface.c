@@ -1,28 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "list.h"
+ 
+#define ACTION_1 1
+#define ACTION_2 2
+#define ACTION_3 3
+#define ACTION_4 4
+#define ACTION_5 5
+#define ACTION_6 6
+#define ACTION_7 7
+#define ACTION_8 8
+#define ACTION_9 9
+#define ACTION_10 10
 
 //Interface functions
 void createListI(struct List **list);
 struct Node* createNodeI();
 void insertToHeadI(struct List *list);
 void insertToTailI(struct List *head);
-void insertByIndexI(struct List *list);
+void insertAfterValueI(struct List *list);
 void deleteNodeByValueI(struct List *list);
 void printListI(struct List *list);
 void clearListI(struct List *list);
+void exitI(struct List *list);
+void createCycleI(struct List *list);
+void findCycleI(struct List *list);
 
 int inputIntI();
 int isListNullI(struct List *list);
-
-const int ACTION_1 = 1;
-const int ACTION_2 = 2;
-const int ACTION_3 = 3;
-const int ACTION_4 = 4;
-const int ACTION_5 = 5;
-const int ACTION_6 = 6;
-const int ACTION_7 = 7;
-const int ACTION_8 = 8;
 
 int main() {
 
@@ -33,7 +38,7 @@ int main() {
     while(1) {
 
         printf(
-                "\n\nChoose option:\n\t1 - Create list\n\t2 - Add element at the head\n\t3 - Add element at the tail\n\t4 - Add element by index\n\t5 - Delete element by value\n\t6 - Print list\n\t7 - Clear list\n\t8 - Exit\n\n"
+                "\n\nChoose option:\n\t1 - Create list\n\t2 - Add element at the head\n\t3 - Add element at the tail\n\t4 - Add element after value\n\t5 - Delete element by value\n\t6 - Print list\n\t7 - Clear list\n\t8 - Create cycle\n\t9 - Find cycle\n\t10 - Exit\n\n"
         );
 
         printf("Option - ");
@@ -50,7 +55,7 @@ int main() {
                 insertToTailI(list);
                 break;
             case ACTION_4:
-                insertByIndexI(list);
+                insertAfterValueI(list);
                 break;
             case ACTION_5:
                 deleteNodeByValueI(list);
@@ -62,8 +67,13 @@ int main() {
                 clearListI(list);
                 break;
             case ACTION_8:
-                clearListI(list);
-                exit(0);
+                createCycleI(list);
+                break;
+            case ACTION_9:
+                findCycleI(list);
+                break;
+            case ACTION_10:
+                exitI(list);
                 break;
             default:
                 printf("\nUnknown option: %d", action);
@@ -73,6 +83,49 @@ int main() {
     }
 
     return 1;
+}
+
+void findCycleI(struct List *list) {
+
+    if (isListNullI(list)) {
+        return;
+    }
+
+    int result = findCycle(list);
+
+    if (result) {
+
+        printf("\nCycle is exist.");
+
+    } else {
+
+        printf("\nCycle is not exist.");
+
+    }
+}
+void createCycleI(struct List *list) {
+
+    if (isListNullI(list)) {
+        return;
+    }
+    
+    int value;
+
+    printf("\nInput existing value: ");
+    scanf("%d", &value);
+
+    int result = createCycle(list, value);
+
+    if (result) {
+
+        printf("Cycle was created.");
+        
+    } else {
+
+        printf("Cycle was not created. No matching values ​​found.");
+
+    }
+
 }
 
 void createListI(struct List **list) {
@@ -135,7 +188,7 @@ void insertToTailI(struct List *list) {
 
 } 
 
-void insertByIndexI(struct List *list) {
+void insertAfterValueI(struct List *list) {
 
     if (isListNullI(list)) {
         return;
@@ -143,15 +196,23 @@ void insertByIndexI(struct List *list) {
 
     struct Node *node = createNodeI();
 
-    int index;
-    printf("Input index: ");
-    scanf("%d", &index);
+    int value;
+    printf("Input value: ");
+    scanf("%d", &value);
 
     if (node != NULL) {
 
-        insertByIndex(list, node, index);
+        int result = insertAfterValue(list, node, value);
 
-        printf("\nElement was created and added to list.");
+        if (result) {
+
+            printf("\nElement was created and added to list.");
+
+        } else {
+
+            printf("\nElement was not added to list. No matching values ​​found.");
+
+        }
 
     }
 
@@ -178,6 +239,13 @@ void deleteNodeByValueI(struct List *list){
         printf("\nNo matches found");
 
     }
+}
+
+void exitI(struct List *list) {
+
+    clearListI(list);
+    exit(0);
+
 }
 
 struct Node* createNodeI() {
