@@ -291,14 +291,7 @@ int createCycle(struct List *list, int value) {
 
     if (isFind) {
 
-        struct Node *p = (*currentNode).nextElement;
         insertToTail(list, currentNode);
-        if ((*list).tail != NULL) {
-            printf("\nHERE1 %d", (*(*(*list).tail).nextElement).value);
-        } else {
-            printf("\nHERE2 %d");
-        }
-        (*currentNode).nextElement = p;
         return 1;
 
     } else {
