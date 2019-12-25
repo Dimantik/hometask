@@ -41,6 +41,7 @@ void printError(int errorMarker);
 void resetPointersForEntryTable(struct Entry **pp, int capacity);
 int isHashTableNull(struct HashTable *hashTable);
 struct Entry* createEntry(int value, int key);
+int sizeOfChain(struct Entry *entry);
 
 
 struct HashTable* createHashTable(int (*hashFunction)(int)) {
@@ -64,7 +65,6 @@ struct HashTable* createHashTableByCapacityByLoadFactor(int (*hashFunction)(int)
     (*entryTable).capacity = capacity;
     (*entryTable).table = (struct Entry**)malloc(sizeof(struct Entry*) * capacity);
 
-    printf("\nAddress one table = %x\t&table = %x", (*entryTable).table, &(*entryTable).table);
     resetPointersForEntryTable((*entryTable).table, capacity);
 
     //create hashTable
@@ -87,8 +87,6 @@ struct HashTable* createHashTableByCapacityByLoadFactor(int (*hashFunction)(int)
 }
 
 int putElement(struct HashTable *hashTable, int key, int value) {
-    
-    printf("\nHERE 1");
 
     if (isHashTableNull(hashTable)) {
 
@@ -96,58 +94,46 @@ int putElement(struct HashTable *hashTable, int key, int value) {
 
     }
 
-    printf("\nHERE 2");
-    int hashCode = ((*hashTable).hashFunction)(key);
-    printf("\nHERE 2.1");
-    int index = indexFor(hashCode, (*(*hashTable).entryTable).capacity);
-    printf("\nHERE 2.2");
 
-    printf("\nHERE 3");
+    int hashCode = ((*hashTable).hashFunction)(key);
+    int index = indexFor(hashCode, (*(*hashTable).entryTable).capacity);
+    int isChanged = 0;
     
     struct Entry **firstEntry = (*(*hashTable).entryTable).table + index;
-    printf("\nTEST\t currentEntry = %x", firstEntry);
 
-    printf("\nHERE 3.1");
     if (*firstEntry == NULL) {
-        printf("\nHERE 3.2");
+
         *firstEntry = createEntry(value, key);
+
     } else {
 
         int isPut = 0;
 
         struct Entry *currentEntry = *firstEntry;
 
-        printf("\nHERE 4");
-
         while(!isPut) {
-
-            printf("\nHERE 5");
 
             if (hashCode == (*hashTable).hashFunction((*currentEntry).key) & key == (*currentEntry).key) {
 
-                printf("\nHERE 5.1");
                 (*currentEntry).value = value;
                 isPut = 1;
+                isChanged = 1;
+
                 break;
 
             }
-
-            printf("\nHERE 5.2");
 
             if ((*currentEntry).nextEntry == NULL) {
-                printf("\nHERE 5.3");
+
                 break;
+
             }
 
-            printf("\nHERE 5.4");
             currentEntry = (*currentEntry).nextEntry;
-            printf("\nHERE 5.5");
 
         }
 
         if (!isPut) {
-
-            printf("\nHERE 7");
 
             (*currentEntry).nextEntry = createEntry(value, key);
 
@@ -161,12 +147,11 @@ int putElement(struct HashTable *hashTable, int key, int value) {
 
     }
 
+    if (!isChanged) {
 
-    printf("\nHERE 6");
+        (*hashTable).size++;
 
-    printf("\nHERE 8");
-
-    (*hashTable).size++;
+    }
 
     return 1;
 }
@@ -293,7 +278,80 @@ int indexFor(int hashCode, int length) {
 
 }
 
+void printStatistics(struct HashTable *hashTable) {
+
+    int nonEmptyCells = 0;
+
+    struct Entry **currentEntry = (*(*hashTable).entryTable).table;
+
+    for (int i = 0; i < (*(*hashTable).entryTable).capacity; i++) {
+
+        if (*(currentEntry + i) != NULL) {
+
+            nonEmptyCells++;
+
+        }
+
+    }
+
+    int maxSize = 0;
+    int minSize = 0;
+    int averageSize = 0;
+
+    currentEntry = (*(*hashTable).entryTable).table;
+
+    for (int i = 0; i < (*(*hashTable).entryTable).capacity; i++) {
+        int size = sizeOfChain(*(currentEntry + i));
+
+        if (maxSize < size) {
+
+            maxSize = size;
+
+        }
+
+        if (minSize > size) {
+
+            minSize = size;
+
+        }
+
+        if (size != 0) {
+
+            averageSize += size;
+
+        }
+
+    }
+
+    averageSize = averageSize / nonEmptyCells;
+
+    printf("\nStatistics:\n\tSize: %d\n\tNon-empty cells: %d\n\tAverage chain length: %d\n\tMinimal chain length: %d\n\tMaximum chain length: %d", (*hashTable).size, nonEmptyCells, averageSize, minSize, maxSize);
+
+}
+
+
 //secondary functions
+
+int sizeOfChain(struct Entry *entry) {
+
+    if (entry == NULL) {
+
+        return 0;
+
+    }
+
+    int size = 0;
+
+    while (entry != NULL) {
+
+        size++;
+        entry = (*entry).nextEntry;
+
+    }
+
+    return size;
+}
+
 int isMemmoryAlocatedP(void *p) {
 
     if (p == NULL) {
@@ -334,14 +392,8 @@ void printError(int errorMarker) {
 
 void resetPointersForEntryTable(struct Entry **pp, int capacity) {
 
-    printf("\nAddress two table = %x\t&table = %x", pp, &pp);
-    //struct Entry *entry;
     for (int i = 0; i < capacity; i++) {
-        // entry = (struct Entry*)malloc(sizeof(struct Entry));
-        // (*entry).value = i;
-        // (*entry).key = i;
-        // (*entry).nextEntry = NULL;
-        // *(pp + i) = entry;
+    
         *(pp + i) = NULL;
 
     }

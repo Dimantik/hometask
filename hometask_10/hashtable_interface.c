@@ -9,28 +9,11 @@ int hashFunction(int key);
 void printEntryList(struct Entry *entry);
 void getByKeyI(struct HashTable *hashtable);
 void removeByKeyI(struct HashTable *hashtable);
+void printStatisticsI(struct HashTable *hashtable);
 
 int main() {
 
     struct HashTable *hashtable = createHashTable(hashFunction);
-
-    printHastableI(hashtable);
-
-    putElementI(hashtable);
-
-    printHastableI(hashtable);
-
-    putElementI(hashtable);
-
-    printHastableI(hashtable);
-
-    removeByKeyI(hashtable);
-
-    printHastableI(hashtable);
-
-    removeByKeyI(hashtable);
-
-    printHastableI(hashtable);
 
     return 1;
 
@@ -106,6 +89,12 @@ void printHastableI(struct HashTable *hashtable) {
     }
     printf("\n\t}");
     printf("\n}");
+}
+
+void printStatisticsI(struct HashTable *hashtable) {
+
+    printStatistics(hashtable);
+
 }
 
 void printEntryList(struct Entry *entry) {
