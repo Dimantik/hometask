@@ -2,16 +2,16 @@
 #include <stdlib.h>
 #include "list.h"
  
-#define ACTION_1 1
-#define ACTION_2 2
-#define ACTION_3 3
-#define ACTION_4 4
-#define ACTION_5 5
-#define ACTION_6 6
-#define ACTION_7 7
-#define ACTION_8 8
-#define ACTION_9 9
-#define ACTION_10 10
+#define OP_CREATE_LIST      1
+#define OP_ADD_EL_TO_HEAD   2
+#define OP_ADD_EL_TO_TAIL   3
+#define OP_ADD_EL_AFTER_VAL 4
+#define OP_DELETE_EL_BY_VAL 5
+#define OP_PRINT_LIST       6
+#define OP_CLEAR_LIST       7
+#define OP_CREATE_CYCLE     8
+#define OP_FIND_CYCLE       9
+#define OP_EXIT             10
 
 //Interface functions
 void createListI(struct List **list);
@@ -45,34 +45,34 @@ int main() {
         scanf("%d", &action);
 
         switch(action) {
-            case ACTION_1:
+            case OP_CREATE_LIST:
                 createListI(&list);
                 break;
-            case ACTION_2:
+            case OP_ADD_EL_TO_HEAD:
                 insertToHeadI(list);
                 break;
-            case ACTION_3:
+            case OP_ADD_EL_TO_TAIL:
                 insertToTailI(list);
                 break;
-            case ACTION_4:
+            case OP_ADD_EL_AFTER_VAL:
                 insertAfterValueI(list);
                 break;
-            case ACTION_5:
+            case OP_DELETE_EL_BY_VAL:
                 deleteNodeByValueI(list);
                 break;
-            case ACTION_6:
+            case OP_PRINT_LIST:
                 printListI(list);
                 break;
-            case ACTION_7:
+            case OP_CLEAR_LIST:
                 clearListI(list);
                 break;
-            case ACTION_8:
+            case OP_CREATE_CYCLE:
                 createCycleI(list);
                 break;
-            case ACTION_9:
+            case OP_FIND_CYCLE:
                 findCycleI(list);
                 break;
-            case ACTION_10:
+            case OP_EXIT:
                 exitI(list);
                 break;
             default:

@@ -307,7 +307,7 @@ int findCycle(struct List *list) {
     struct Node *pointOne = (*list).head;
     struct Node *pointTwo = (*pointOne).nextElement;
     
-    int isHaveCycle = 0;
+    int hasCycle = 0;
 
     while(1) {
 
@@ -316,7 +316,7 @@ int findCycle(struct List *list) {
         }
 
         if (pointOne == pointTwo) {
-            isHaveCycle = 1;
+            hasCycle = 1;
             break;
         }
 
@@ -331,7 +331,7 @@ int findCycle(struct List *list) {
 
     }
 
-    return isHaveCycle;
+    return hasCycle;
 }
 
 //Secondary functions
